@@ -99,7 +99,7 @@ def load_raw(settings: Settings) -> tuple[pd.DataFrame, str]:
         logger.info("Loaded Kaggle dataset: %d rows from %s", len(df), kaggle)
         return df[ALL_COLUMNS].copy(), SOURCE_KAGGLE
 
-    logger.warning("%s not found -> generating SYNTHETIC data (results are optimistic).", kaggle)
+    logger.warning("%s not found -> generating SYNTHETIC data (results are NOT real-world performance).", kaggle)
     df = generate_synthetic(settings.data.synthetic_rows, settings.data.synthetic_default_rate, settings.seed)
     out = Path(settings.paths.synthetic_file)
     out.parent.mkdir(parents=True, exist_ok=True)

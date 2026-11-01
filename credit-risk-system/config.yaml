@@ -1,0 +1,70 @@
+# CreditRisk configuration. Paths are relative to this file. No path is hardcoded in code.
+seed: 42
+
+paths:
+  kaggle_file: data/cs-training.csv          # put the Kaggle file here (manual download)
+  synthetic_file: data/synthetic_training.csv
+  models_dir: models
+  reports_dir: reports
+  database: data/creditrisk.db
+
+data:
+  synthetic_rows: 60000
+  synthetic_default_rate: 0.07
+
+split:
+  test_size: 0.20
+  validation_size: 0.20      # fraction of the whole dataset
+
+cleaning:                    # every rule is documented in docs/data_dictionary.md
+  utilization_cap: 1.5
+  debt_ratio_cap: 5.0
+  past_due_cap: 10           # also neutralises the 96/98 special codes in the Kaggle data
+  monthly_income_cap: 50000
+  open_credit_lines_cap: 30
+  real_estate_loans_cap: 10
+  dependents_cap: 10
+  dependents_fill: 0
+  age_min: 18
+  age_max: 100
+
+features:
+  high_debt_ratio_flag: 0.43   # common debt-to-income guideline
+
+scorecard:
+  max_bins: 8
+  min_bin_share: 0.05
+  min_iv: 0.02                 # features with lower IV are dropped from the scorecard
+
+score:
+  base_score: 600
+  base_odds: 50                # good:bad odds at the base score
+  pdo: 20                      # points to double the odds
+
+model:                         # GradientBoostingClassifier
+  n_estimators: 200
+  learning_rate: 0.05
+  max_depth: 3
+  subsample: 0.8
+  min_samples_leaf: 50
+
+costs:                         # simple expected-cost decision rule
+  cost_of_default: 10000       # loss when a bad loan is approved
+  lost_profit_good: 1000       # profit lost when a good customer is declined
+  refer_ratio: 0.40            # APPROVE below refer_ratio * decline cut-off, REFER in between
+
+thresholds:                    # leave null to derive from costs; set numbers to override
+  approve_below: null
+  decline_at_or_above: null
+
+risk_bands:
+  low_below: 0.03
+  high_at_or_above: 0.10
+
+drift:
+  warn: 0.10
+  alert: 0.25
+  min_rows: 100
+
+reasons:
+  max_reasons: 4
